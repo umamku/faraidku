@@ -1,0 +1,68 @@
+/* 1. Direktif Standar Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 2. Konfigurasi Font (Opsional, agar mirip preview) */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8fafc; /* bg-slate-50 */
+}
+
+/* 3. Animasi Kustom */
+/* Aplikasi ini menggunakan class animasi seperti 'animate-in', 'fade-in', 
+   'zoom-in', dsb. Biasanya ini disediakan oleh plugin 'tailwindcss-animate'.
+   Jika Anda tidak menggunakan plugin tersebut, copy CSS di bawah ini 
+   agar animasi tetap berjalan.
+*/
+
+@layer utilities {
+  .animate-in {
+    animation-name: enter;
+    animation-duration: 0.5s; /* duration-500 */
+    --tw-enter-opacity: 1;
+    --tw-enter-scale: 1;
+    --tw-enter-rotate: 0;
+    --tw-enter-translate-x: 0;
+    --tw-enter-translate-y: 0;
+  }
+
+  .fade-in {
+    --tw-enter-opacity: 0;
+    animation-name: enter;
+  }
+
+  .zoom-in {
+    --tw-enter-scale: 0.95;
+  }
+
+  .slide-in-from-bottom-4 {
+    --tw-enter-translate-y: 1rem;
+  }
+
+  .slide-in-from-right-4 {
+    --tw-enter-translate-x: 1rem;
+  }
+
+  @keyframes enter {
+    from {
+      opacity: var(--tw-enter-opacity, 1);
+      transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), 1) rotate(var(--tw-enter-rotate, 0));
+    }
+  }
+}
+
+/* 4. Scrollbar Halus (Opsional) */
+@layer utilities {
+  .overflow-auto::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .overflow-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .overflow-auto::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+  }
+}
