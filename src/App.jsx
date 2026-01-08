@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Calculator, Info, Calculator as CalcIcon, Coins, Users, RefreshCcw, HelpCircle, User, Heart, Plus, Minus, PieChart as PieChartIcon, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { BookOpen, Calculator, Info, Calculator as CalcIcon, Coins, Users, RefreshCcw, HelpCircle, User, Heart, Plus, Minus, PieChart as PieChartIcon, ChevronDown, ChevronUp } from 'lucide-react';
 
 const FaraidApp = () => {
   const [activeTab, setActiveTab] = useState('belajar');
@@ -145,26 +145,14 @@ const DistributionChart = ({ data }) => {
 
 // --- KOMPONEN FAMILY TREE INTERAKTIF ---
 const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGender }) => {
-  const [scale, setScale] = useState(0.6); // Default scale untuk mobile agar fit
+  const [showExtended, setShowExtended] = useState(false);
 
-  // Reset scale saat resize window
+  // Auto-expand jika ada data keluarga jauh yang aktif
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 640) {
-        setScale(1); // Desktop normal size
-      } else {
-        setScale(0.55); // Mobile fit size
-      }
-    };
-    
-    handleResize(); // Init
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (heirs.kakekAyah || heirs.nenekAyah || heirs.nenekIbu || heirs.paman > 0 || heirs.saudaraLk > 0 || heirs.saudaraPr > 0) {
+      setShowExtended(true);
+    }
   }, []);
-
-  const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 1.2));
-  const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.4));
-  const resetZoom = () => setScale(window.innerWidth >= 640 ? 1 : 0.55);
 
   const toggleHeir = (key) => {
     setHeirs(prev => ({ ...prev, [key]: !prev[key] }));
@@ -182,16 +170,16 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
   };
 
   // Node Component reusable
-  const TreeNode = ({ label, active, isMain, isSpouse, countKey, onClick, icon, count, colorClass, small }) => {
+  const TreeNode = ({ label, active, isMain, isSpouse, countKey, onClick, icon, count, colorClass, small, disabled }) => {
     const isCountable = countKey !== undefined;
     const isActive = isCountable ? count > 0 : active;
 
     const baseSize = small ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14";
     const iconSize = small ? "w-5 h-5" : "w-6 h-6 sm:w-7 sm:h-7";
-    const textSize = small ? "text-[8px] sm:text-[9px]" : "text-[10px] sm:text-xs";
+    const textSize = small ? "text-[9px] leading-tight" : "text-[10px] sm:text-xs leading-tight";
 
     return (
-      <div className={`flex flex-col items-center z-10 transition-all duration-300 animate-in zoom-in group relative flex-shrink-0 mx-1 ${isMain ? 'scale-110' : ''}`}>
+      <div className={`flex flex-col items-center z-10 transition-all duration-300 animate-in zoom-in group relative flex-shrink-0 mx-1 ${isMain ? 'scale-110' : ''} ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
         <button 
           onClick={onClick}
           className={`${baseSize} rounded-full border-2 flex items-center justify-center mb-1 relative shadow-sm transition-all
@@ -210,14 +198,14 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
           )}
         </button>
 
-        {isCountable && (
+        {isCountable && !disabled && (
           <div className="absolute top-0 -right-6 flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 p-0.5 rounded shadow-sm backdrop-blur-sm z-20">
              <button onClick={(e) => { e.stopPropagation(); updateCount(countKey, 1); }} className="w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center hover:bg-emerald-200 border border-emerald-200"><Plus size={10} /></button>
              <button onClick={(e) => { e.stopPropagation(); updateCount(countKey, -1); }} className="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center hover:bg-red-200 border border-red-200"><Minus size={10} /></button>
           </div>
         )}
 
-        <span className={`${textSize} font-bold text-center max-w-[80px] leading-tight select-none ${isMain ? 'text-emerald-800' : (isActive ? 'text-slate-700' : 'text-slate-400')}`}>
+        <span className={`${textSize} font-bold text-center max-w-[70px] select-none ${isMain ? 'text-emerald-800' : (isActive ? 'text-slate-700' : 'text-slate-400')}`}>
           {label}
         </span>
       </div>
@@ -225,71 +213,90 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
   };
 
   return (
-    <div className="w-full bg-white rounded-lg border border-slate-200 p-2 sm:p-4 mb-6 relative overflow-hidden">
-      <div className="flex justify-between items-center mb-2 px-2">
+    <div className="w-full bg-white rounded-lg border border-slate-200 p-2 sm:p-4 mb-4 relative overflow-hidden">
+      <div className="flex justify-between items-center mb-4 px-2 border-b border-slate-100 pb-2">
         <h4 className="text-sm font-bold text-slate-700 flex items-center">
-          <Users className="w-4 h-4 mr-2" /> Bagan Struktur
+          <Users className="w-4 h-4 mr-2" /> Struktur Keluarga
         </h4>
         
-        {/* Zoom Controls */}
-        <div className="flex items-center space-x-1 bg-slate-100 rounded-lg p-1">
-           <button onClick={zoomOut} className="p-1 hover:bg-white rounded text-slate-600"><ZoomOut size={14} /></button>
-           <span className="text-[10px] w-8 text-center text-slate-500">{Math.round(scale * 100)}%</span>
-           <button onClick={zoomIn} className="p-1 hover:bg-white rounded text-slate-600"><ZoomIn size={14} /></button>
-           <div className="w-px h-3 bg-slate-300 mx-1"></div>
-           <button onClick={resetZoom} className="p-1 hover:bg-white rounded text-slate-600" title="Reset"><Maximize size={14} /></button>
-        </div>
+        <button 
+          onClick={() => setShowExtended(!showExtended)}
+          className="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full hover:bg-emerald-100 transition-colors"
+        >
+          {showExtended ? 'Mode Ringkas' : 'Mode Lengkap'}
+          {showExtended ? <ChevronUp size={14} className="ml-1" /> : <ChevronDown size={14} className="ml-1" />}
+        </button>
       </div>
       
-      {/* Container Scalable */}
-      <div className="w-full flex justify-center items-start overflow-hidden transition-all duration-300 bg-slate-50/50 rounded-lg border border-slate-100/50" style={{ height: `${360 * scale}px` }}>
-        <div 
-          className="origin-top transition-transform duration-300 ease-out pt-4"
-          style={{ transform: `scale(${scale})` }}
-        >
-          <div className="min-w-[580px] flex flex-col items-center">
-            
-            {/* LEVEL 0: KAKEK & NENEK */}
-            <div className="flex justify-between w-full max-w-lg mb-4 relative">
-               {/* Jalur Ayah */}
-               <div className="flex flex-col items-center">
-                  <div className="flex space-x-4 mb-1">
+      {/* Container - Menggunakan scroll hanya jika overflow, tapi didesain agar fit di mobile */}
+      <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+        <div className={`flex flex-col items-center transition-all duration-500 ${showExtended ? 'min-w-[500px]' : 'min-w-full'}`}>
+          
+          {/* --- LEVEL 0: KAKEK & NENEK (Hanya muncul di Mode Lengkap) --- */}
+          {showExtended && (
+            <div className="flex justify-center w-full mb-6 relative animate-in fade-in slide-in-from-bottom-4">
+               {/* Group Ayah */}
+               <div className="flex flex-col items-center mx-4 sm:mx-8">
+                  <div className="flex space-x-3 mb-1">
                      <TreeNode label="Kakek (Ayah)" active={heirs.kakekAyah} onClick={() => toggleHeir('kakekAyah')} small colorClass="border-indigo-300 bg-indigo-50 text-indigo-500" />
                      <TreeNode label="Nenek (Ayah)" active={heirs.nenekAyah} onClick={() => toggleHeir('nenekAyah')} small colorClass="border-indigo-300 bg-indigo-50 text-indigo-500" />
                   </div>
-                  <div className="h-4 border-l-2 border-dashed border-indigo-200"></div>
+                  <div className="text-[9px] text-slate-400 mb-1">Jalur Ayah</div>
+                  {/* Line down to Ayah */}
+                  <div className="h-4 w-px border-l-2 border-dashed border-indigo-200 absolute top-full left-[30%] -translate-x-1/2 z-0"></div>
                </div>
 
-               {/* Jalur Ibu */}
-               <div className="flex flex-col items-center">
-                  <div className="flex space-x-4 mb-1">
-                     <div className="w-10"></div> 
+               {/* Group Ibu */}
+               <div className="flex flex-col items-center mx-4 sm:mx-8">
+                  <div className="flex space-x-3 mb-1">
+                     <div className="w-10"></div> {/* Spacer for Kakek Ibu placeholder */}
                      <TreeNode label="Nenek (Ibu)" active={heirs.nenekIbu} onClick={() => toggleHeir('nenekIbu')} small colorClass="border-indigo-300 bg-indigo-50 text-indigo-500" />
                   </div>
-                  <div className="h-4 border-l-2 border-dashed border-indigo-200 translate-x-6"></div>
+                  <div className="text-[9px] text-slate-400 mb-1">Jalur Ibu</div>
+                  {/* Line down to Ibu */}
+                  <div className="h-4 w-px border-l-2 border-dashed border-indigo-200 absolute top-full right-[30%] translate-x-1/2 z-0"></div>
                </div>
             </div>
+          )}
 
-            {/* LEVEL 1: ORANG TUA */}
-            <div className="flex justify-between w-full max-w-md relative mb-6">
-              <div className="flex flex-col items-center">
-                 <TreeNode label="Ayah" active={heirs.ayah} onClick={() => toggleHeir('ayah')} />
+          {/* --- LEVEL 1: ORANG TUA & PAMAN --- */}
+          <div className="flex justify-center items-end w-full relative mb-6">
+            
+            {/* Paman (Kiri Ayah - Mode Lengkap) */}
+            {showExtended && (
+              <div className="mr-4 mb-6 animate-in fade-in slide-in-from-right-4">
+                 <TreeNode 
+                     label="Paman" 
+                     countKey="paman"
+                     count={heirs.paman}
+                     onClick={() => heirs.paman === 0 ? updateCount('paman', 1) : null}
+                     small 
+                     colorClass="border-slate-400 bg-slate-50 text-slate-600" 
+                  />
+                  <div className="h-0.5 w-4 bg-slate-300 absolute top-6 left-12 -z-10"></div> {/* Connector to Ayah */}
               </div>
-              
-              {/* Connector Parents */}
-              <div className="absolute top-1/2 left-10 right-10 h-0.5 border-t-2 border-slate-300 -z-10"></div>
-              
-              <div className="flex flex-col items-center">
-                 <TreeNode label="Ibu" active={heirs.ibu} onClick={() => toggleHeir('ibu')} />
-              </div>
+            )}
+
+            {/* Ayah & Ibu */}
+            <div className="flex space-x-16 sm:space-x-24 relative">
+               <TreeNode label="Ayah" active={heirs.ayah} onClick={() => toggleHeir('ayah')} />
+               <TreeNode label="Ibu" active={heirs.ibu} onClick={() => toggleHeir('ibu')} />
+               
+               {/* Connector between Parents */}
+               <div className="absolute top-1/2 left-10 right-10 h-0.5 border-t-2 border-slate-300 -z-10"></div>
+               {/* Vertical line down to Jenazah */}
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 h-16 w-0.5 border-l-2 border-slate-300 -z-10"></div>
             </div>
+          </div>
 
-            {/* LEVEL 2: JENAZAH, SAUDARA, PASANGAN */}
-            <div className="flex items-center justify-center space-x-6 relative mb-6">
-               {/* Saudara Kandung */}
-               <div className="flex flex-col items-end space-y-2 mr-4 border-r-2 border-slate-200 pr-4">
-                  <div className="flex items-center">
-                     <span className="text-[10px] text-slate-400 mr-2 text-right">Sdr<br/>Kandung</span>
+          {/* --- LEVEL 2: SAUDARA - JENAZAH - PASANGAN --- */}
+          <div className="flex items-center justify-center relative mb-6">
+             
+             {/* Saudara Kandung (Kiri Jenazah - Mode Lengkap) */}
+             {showExtended && (
+               <div className="flex flex-col items-end mr-6 pr-4 border-r-2 border-slate-100 animate-in fade-in slide-in-from-right-4">
+                  <span className="text-[9px] text-slate-400 mb-1 text-right block">Sdr Kandung</span>
+                  <div className="flex space-x-2">
                      <TreeNode 
                        label="Lk" 
                        countKey="saudaraLk"
@@ -308,9 +315,10 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
                      />
                   </div>
                </div>
+             )}
 
-               <div className="absolute -top-6 left-1/2 h-6 border-l-2 border-slate-300"></div>
-
+            {/* JENAZAH (Center) */}
+            <div className="relative z-10">
               <TreeNode 
                 label={`Jenazah (${jenazahGender})`} 
                 active={true} 
@@ -318,73 +326,63 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
                 icon={<User className="w-6 h-6" />}
                 onClick={toggleGender}
               />
-
-              {/* Garis Nikah */}
-              <div className="flex items-center">
-                  <div className="w-8 border-t-2 border-dashed border-slate-400 relative">
-                    <Heart className="w-3 h-3 text-red-400 absolute -top-1.5 left-1/2 -translate-x-1/2 bg-white px-0.5" fill="currentColor" />
-                  </div>
-                  {jenazahGender === 'L' ? (
-                      <TreeNode 
-                        label={`Istri (${heirs.istriCount || 0})`} 
-                        countKey="istriCount"
-                        count={heirs.istriCount}
-                        onClick={() => heirs.istriCount === 0 ? updateCount('istriCount', 1) : null}
-                        isSpouse={true} 
-                        icon={<User className="w-5 h-5" />}
-                      />
-                  ) : (
-                      <TreeNode 
-                        label="Suami" 
-                        active={heirs.pasangan} 
-                        isSpouse={true} 
-                        icon={<User className="w-5 h-5" />}
-                        onClick={() => toggleHeir('pasangan')}
-                      />
-                  )}
-              </div>
             </div>
 
-            {/* LEVEL 3: ANAK-ANAK */}
-            <div className="flex flex-col items-center">
-               <div className="h-6 border-l-2 border-slate-300 -mt-2"></div>
-               <div className="w-40 border-t-2 border-slate-300 h-2 relative mb-1">
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-300 rounded-full"></div>
-               </div>
-               
-               <div className="flex justify-center space-x-8">
-                 <TreeNode 
-                   label="Anak Laki" 
-                   countKey="anakLk"
-                   count={heirs.anakLk}
-                   onClick={() => heirs.anakLk === 0 ? updateCount('anakLk', 1) : null}
-                 />
-                 <TreeNode 
-                   label="Anak Pr" 
-                   countKey="anakPr"
-                   count={heirs.anakPr}
-                   onClick={() => heirs.anakPr === 0 ? updateCount('anakPr', 1) : null}
-                 />
-               </div>
+            {/* Connector Nikah */}
+            <div className="w-8 sm:w-12 h-0.5 border-t-2 border-dashed border-slate-400 relative mx-1">
+               <Heart className="w-3 h-3 text-red-400 absolute -top-1.5 left-1/2 -translate-x-1/2 bg-white px-0.5" fill="currentColor" />
             </div>
 
-            {/* Paman */}
-            <div className="absolute right-4 top-1/2 border-l-2 border-slate-100 pl-2">
-                 <div className="text-[9px] text-slate-400 mb-1">Jalur Ayah</div>
-                 <TreeNode 
-                     label="Paman" 
-                     countKey="paman"
-                     count={heirs.paman}
-                     onClick={() => heirs.paman === 0 ? updateCount('paman', 1) : null}
-                     small 
-                     colorClass="border-slate-400 bg-slate-50 text-slate-600" 
-                  />
-            </div>
-
+            {/* PASANGAN */}
+            {jenazahGender === 'L' ? (
+                <TreeNode 
+                  label={`Istri (${heirs.istriCount || 0})`} 
+                  countKey="istriCount"
+                  count={heirs.istriCount}
+                  onClick={() => heirs.istriCount === 0 ? updateCount('istriCount', 1) : null}
+                  isSpouse={true} 
+                  icon={<User className="w-5 h-5" />}
+                />
+            ) : (
+                <TreeNode 
+                  label="Suami" 
+                  active={heirs.pasangan} 
+                  isSpouse={true} 
+                  icon={<User className="w-5 h-5" />}
+                  onClick={() => toggleHeir('pasangan')}
+                />
+            )}
           </div>
+
+          {/* --- LEVEL 3: ANAK-ANAK --- */}
+          <div className="flex flex-col items-center">
+             <div className="h-6 border-l-2 border-slate-300 -mt-2"></div>
+             <div className="w-32 sm:w-40 border-t-2 border-slate-300 h-2 relative mb-1">
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-300 rounded-full"></div>
+             </div>
+             
+             <div className="flex justify-center space-x-6 sm:space-x-10">
+               <TreeNode 
+                 label="Anak Laki" 
+                 countKey="anakLk"
+                 count={heirs.anakLk}
+                 onClick={() => heirs.anakLk === 0 ? updateCount('anakLk', 1) : null}
+               />
+               <TreeNode 
+                 label="Anak Pr" 
+                 countKey="anakPr"
+                 count={heirs.anakPr}
+                 onClick={() => heirs.anakPr === 0 ? updateCount('anakPr', 1) : null}
+               />
+             </div>
+          </div>
+
         </div>
       </div>
-      <p className="text-center text-[10px] text-slate-400 -mt-2 mb-2">Gunakan tombol zoom atau klik ikon untuk edit</p>
+      
+      <p className="text-center text-[10px] text-slate-400 mt-2 flex items-center justify-center">
+        <Info size={10} className="mr-1"/> Klik ikon orang untuk mengaktifkan/menonaktifkan
+      </p>
     </div>
   );
 };
