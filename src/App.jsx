@@ -143,7 +143,7 @@ const DistributionChart = ({ data }) => {
   );
 };
 
-// --- KOMPONEN FAMILY TREE INTERAKTIF ---
+// --- KOMPONEN FAMILY TREE INTERAKTIF (PERBAIKAN SCROLL) ---
 const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGender }) => {
   const [showExtended, setShowExtended] = useState(false);
 
@@ -211,7 +211,8 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
   };
 
   return (
-    <div className="w-full bg-white rounded-lg border border-slate-200 p-2 sm:p-4 mb-4 relative overflow-hidden">
+    // FIX: Hapus overflow-hidden dari container utama
+    <div className="w-full bg-white rounded-lg border border-slate-200 p-2 sm:p-4 mb-4 relative">
       <div className="flex justify-between items-center mb-4 px-2 border-b border-slate-100 pb-2">
         <h4 className="text-sm font-bold text-slate-700 flex items-center">
           <Users className="w-4 h-4 mr-2" /> Struktur Keluarga
@@ -226,8 +227,10 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
         </button>
       </div>
       
-      <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
-        <div className={`flex flex-col items-center transition-all duration-500 ${showExtended ? 'min-w-[500px]' : 'min-w-full'}`}>
+      {/* FIX: Hapus scrollbar-hide dan tambah padding bottom agar scrollbar muat */}
+      <div className="w-full overflow-x-auto pb-4">
+        {/* FIX: Tambah min-w-[600px] pada mode extended agar memicu scroll di HP */}
+        <div className={`flex flex-col items-center transition-all duration-500 ${showExtended ? 'min-w-[600px]' : 'w-full'}`}>
           
           {/* LEVEL 0: KAKEK & NENEK */}
           {showExtended && (
@@ -368,7 +371,7 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
       </div>
       
       <p className="text-center text-[10px] text-slate-400 mt-2 flex items-center justify-center">
-        <Info size={10} className="mr-1"/> Klik ikon orang untuk mengaktifkan/menonaktifkan
+        <Info size={10} className="mr-1"/> {showExtended ? "Geser kiri-kanan untuk melihat semua keluarga" : "Klik ikon orang untuk mengaktifkan/menonaktifkan"}
       </p>
     </div>
   );
