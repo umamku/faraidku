@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Calculator, Info, Calculator as CalcIcon, Coins, Users, RefreshCcw, HelpCircle, User, Heart, Plus, Minus, PieChart as PieChartIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { BookOpen, Calculator, Info, Calculator as CalcIcon, Coins, Users, RefreshCcw, HelpCircle, User, Heart, Plus, Minus, PieChart as PieChartIcon, ChevronDown, ChevronUp, ScrollText, AlertTriangle, Scale, List } from 'lucide-react';
 
 const FaraidApp = () => {
   const [activeTab, setActiveTab] = useState('belajar');
@@ -147,7 +147,6 @@ const DistributionChart = ({ data }) => {
 const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGender }) => {
   const [showExtended, setShowExtended] = useState(false);
 
-  // Auto-expand jika ada data keluarga jauh yang aktif
   useEffect(() => {
     if (heirs.kakekAyah || heirs.nenekAyah || heirs.nenekIbu || heirs.paman > 0 || heirs.saudaraLk > 0 || heirs.saudaraPr > 0) {
       setShowExtended(true);
@@ -169,7 +168,6 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
     });
   };
 
-  // Node Component reusable
   const TreeNode = ({ label, active, isMain, isSpouse, countKey, onClick, icon, count, colorClass, small, disabled }) => {
     const isCountable = countKey !== undefined;
     const isActive = isCountable ? count > 0 : active;
@@ -228,11 +226,10 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
         </button>
       </div>
       
-      {/* Container - Menggunakan scroll hanya jika overflow, tapi didesain agar fit di mobile */}
       <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
         <div className={`flex flex-col items-center transition-all duration-500 ${showExtended ? 'min-w-[500px]' : 'min-w-full'}`}>
           
-          {/* --- LEVEL 0: KAKEK & NENEK (Hanya muncul di Mode Lengkap) --- */}
+          {/* LEVEL 0: KAKEK & NENEK */}
           {showExtended && (
             <div className="flex justify-center w-full mb-6 relative animate-in fade-in slide-in-from-bottom-4">
                {/* Group Ayah */}
@@ -242,27 +239,24 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
                      <TreeNode label="Nenek (Ayah)" active={heirs.nenekAyah} onClick={() => toggleHeir('nenekAyah')} small colorClass="border-indigo-300 bg-indigo-50 text-indigo-500" />
                   </div>
                   <div className="text-[9px] text-slate-400 mb-1">Jalur Ayah</div>
-                  {/* Line down to Ayah */}
                   <div className="h-4 w-px border-l-2 border-dashed border-indigo-200 absolute top-full left-[30%] -translate-x-1/2 z-0"></div>
                </div>
 
                {/* Group Ibu */}
                <div className="flex flex-col items-center mx-4 sm:mx-8">
                   <div className="flex space-x-3 mb-1">
-                     <div className="w-10"></div> {/* Spacer for Kakek Ibu placeholder */}
+                     <div className="w-10"></div> 
                      <TreeNode label="Nenek (Ibu)" active={heirs.nenekIbu} onClick={() => toggleHeir('nenekIbu')} small colorClass="border-indigo-300 bg-indigo-50 text-indigo-500" />
                   </div>
                   <div className="text-[9px] text-slate-400 mb-1">Jalur Ibu</div>
-                  {/* Line down to Ibu */}
                   <div className="h-4 w-px border-l-2 border-dashed border-indigo-200 absolute top-full right-[30%] translate-x-1/2 z-0"></div>
                </div>
             </div>
           )}
 
-          {/* --- LEVEL 1: ORANG TUA & PAMAN --- */}
+          {/* LEVEL 1: ORANG TUA & PAMAN */}
           <div className="flex justify-center items-end w-full relative mb-6">
             
-            {/* Paman (Kiri Ayah - Mode Lengkap) */}
             {showExtended && (
               <div className="mr-4 mb-6 animate-in fade-in slide-in-from-right-4">
                  <TreeNode 
@@ -273,26 +267,22 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
                      small 
                      colorClass="border-slate-400 bg-slate-50 text-slate-600" 
                   />
-                  <div className="h-0.5 w-4 bg-slate-300 absolute top-6 left-12 -z-10"></div> {/* Connector to Ayah */}
+                  <div className="h-0.5 w-4 bg-slate-300 absolute top-6 left-12 -z-10"></div>
               </div>
             )}
 
-            {/* Ayah & Ibu */}
             <div className="flex space-x-16 sm:space-x-24 relative">
                <TreeNode label="Ayah" active={heirs.ayah} onClick={() => toggleHeir('ayah')} />
                <TreeNode label="Ibu" active={heirs.ibu} onClick={() => toggleHeir('ibu')} />
                
-               {/* Connector between Parents */}
                <div className="absolute top-1/2 left-10 right-10 h-0.5 border-t-2 border-slate-300 -z-10"></div>
-               {/* Vertical line down to Jenazah */}
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 h-16 w-0.5 border-l-2 border-slate-300 -z-10"></div>
             </div>
           </div>
 
-          {/* --- LEVEL 2: SAUDARA - JENAZAH - PASANGAN --- */}
+          {/* LEVEL 2: SAUDARA - JENAZAH - PASANGAN */}
           <div className="flex items-center justify-center relative mb-6">
              
-             {/* Saudara Kandung (Kiri Jenazah - Mode Lengkap) */}
              {showExtended && (
                <div className="flex flex-col items-end mr-6 pr-4 border-r-2 border-slate-100 animate-in fade-in slide-in-from-right-4">
                   <span className="text-[9px] text-slate-400 mb-1 text-right block">Sdr Kandung</span>
@@ -317,7 +307,6 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
                </div>
              )}
 
-            {/* JENAZAH (Center) */}
             <div className="relative z-10">
               <TreeNode 
                 label={`Jenazah (${jenazahGender})`} 
@@ -328,12 +317,10 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
               />
             </div>
 
-            {/* Connector Nikah */}
             <div className="w-8 sm:w-12 h-0.5 border-t-2 border-dashed border-slate-400 relative mx-1">
                <Heart className="w-3 h-3 text-red-400 absolute -top-1.5 left-1/2 -translate-x-1/2 bg-white px-0.5" fill="currentColor" />
             </div>
 
-            {/* PASANGAN */}
             {jenazahGender === 'L' ? (
                 <TreeNode 
                   label={`Istri (${heirs.istriCount || 0})`} 
@@ -354,7 +341,7 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
             )}
           </div>
 
-          {/* --- LEVEL 3: ANAK-ANAK --- */}
+          {/* LEVEL 3: ANAK-ANAK */}
           <div className="flex flex-col items-center">
              <div className="h-6 border-l-2 border-slate-300 -mt-2"></div>
              <div className="w-32 sm:w-40 border-t-2 border-slate-300 h-2 relative mb-1">
@@ -387,45 +374,235 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
   );
 };
 
-// --- KOMPONEN BELAJAR ---
+// --- KOMPONEN BELAJAR (DIPERBARUI) ---
 const LearningModule = () => {
-  const topics = [
+  const [openSection, setOpenSection] = useState(null);
+
+  const toggleSection = (idx) => {
+    setOpenSection(openSection === idx ? null : idx);
+  };
+
+  const sections = [
     {
-      title: "Apa itu Faraid?",
-      content: "Faraid adalah ilmu untuk mengetahui siapa yang berhak mewarisi dan siapa yang tidak, serta berapa kadar ukuran yang diterima oleh setiap ahli waris. Hukum ini bersumber langsung dari Al-Qur'an.",
-      icon: <Info className="h-6 w-6 text-emerald-600" />
+      title: "1. Pengantar & Definisi",
+      icon: <BookOpen className="h-5 w-5 text-emerald-600" />,
+      content: (
+        <div className="space-y-3 text-sm text-slate-600">
+          <p><strong>Faraid (الفرائض)</strong> adalah bentuk jamak dari <em>Faridhah</em>, yang artinya ketentuan yang telah dipastikan kadarnya. Secara istilah syara', Faraid adalah ilmu tentang pembagian harta peninggalan kepada ahli waris yang berhak menerimanya.</p>
+          <p><strong>Hukum Mempelajari:</strong> Fardhu Kifayah (Kewajiban kolektif). Namun, menerapkannya secara adil hukumnya Fardhu 'Ain bagi yang terlibat.</p>
+        </div>
+      )
     },
     {
-      title: "Hijab (Penghalang)",
-      content: "Tidak semua keluarga mendapat warisan. Ada yang terhalang (Mahjub) oleh ahli waris yang lebih dekat. Contoh: Kakek terhalang oleh Ayah, Saudara terhalang oleh Anak Laki-laki.",
-      icon: <Users className="h-6 w-6 text-emerald-600" />
+      title: "2. Dalil & Dasar Hukum (Quran & Hadits)",
+      icon: <ScrollText className="h-5 w-5 text-emerald-600" />,
+      content: (
+        <div className="space-y-4 text-sm text-slate-600">
+          <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+            <p className="font-bold text-emerald-800 mb-1">QS. An-Nisa: 11 (Anak & Orang Tua)</p>
+            <p className="italic">"Allah mensyariatkan bagimu tentang (pembagian pusaka untuk) anak-anakmu. Yaitu: bagian seorang anak laki-laki sama dengan bagian dua orang anak perempuan..."</p>
+          </div>
+          <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+            <p className="font-bold text-emerald-800 mb-1">QS. An-Nisa: 12 (Suami, Istri, Saudara Seibu)</p>
+            <p className="italic">"Dan bagimu (suami-suami) seperdua dari harta yang ditinggalkan oleh istri-istrimu, jika mereka tidak mempunyai anak..."</p>
+          </div>
+          <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+            <p className="font-bold text-emerald-800 mb-1">QS. An-Nisa: 176 (Kalalah)</p>
+            <p className="italic">"Mereka meminta fatwa kepadamu (tentang kalalah). Katakanlah: Allah memberi fatwa kepadamu tentang kalalah (seseorang mati tanpa meninggalkan ayah dan anak)..."</p>
+          </div>
+          <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+            <p className="font-bold text-emerald-800 mb-1">HR. Bukhari & Muslim (Asabah)</p>
+            <p className="italic">"Berikanlah harta warisan kepada yang berhak menerimanya (Ashabul Furudh). Sisanya untuk laki-laki yang paling dekat nasabnya."</p>
+          </div>
+        </div>
+      )
     },
     {
-      title: "Poligami (Istri > 1)",
-      content: "Jika istri lebih dari satu, mereka berbagi rata bagian 1/8 (jika ada anak) atau 1/4 (jika tidak ada anak). Bagian tersebut dibagi rata sesuai jumlah istri.",
-      icon: <CalcIcon className="h-6 w-6 text-emerald-600" />
+      title: "3. Rukun, Syarat, Sebab & Penghalang",
+      icon: <Scale className="h-5 w-5 text-emerald-600" />,
+      content: (
+        <div className="space-y-4 text-sm text-slate-600">
+          <div>
+            <h5 className="font-bold text-slate-800 mb-1">Rukun Waris (3 Hal):</h5>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Muwaris:</strong> Orang yang meninggal dunia (Pewaris).</li>
+              <li><strong>Waris:</strong> Orang yang hidup dan berhak menerima harta (Ahli Waris).</li>
+              <li><strong>Mauruts/Tirkah:</strong> Harta peninggalan.</li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-bold text-slate-800 mb-1">Syarat Waris (3 Hal):</h5>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Matinya Muwaris (secara yakin atau vonis hakim untuk orang hilang).</li>
+              <li>Hidupnya Ahli Waris saat kematian Muwaris (janin dalam kandungan termasuk jika lahir hidup).</li>
+              <li>Tidak ada penghalang (Mawani').</li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-bold text-slate-800 mb-1">Sebab-sebab Waris:</h5>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Nasab:</strong> Hubungan darah (Orang tua, anak, saudara, paman).</li>
+              <li><strong>Nikah:</strong> Pernikahan yang sah (Suami/Istri).</li>
+              <li><strong>Wala':</strong> Memerdekakan budak (jarang terjadi di masa kini).</li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-bold text-red-600 mb-1 flex items-center"><AlertTriangle size={14} className="mr-1"/> Penghalang Waris (Mawani'):</h5>
+            <ul className="list-disc pl-5 space-y-1 text-red-700">
+              <li><strong>Pembunuhan:</strong> Pembunuh tidak mewarisi dari yang dibunuh.</li>
+              <li><strong>Beda Agama:</strong> Muslim tidak mewarisi kafir, dan sebaliknya.</li>
+              <li><strong>Perbudakan:</strong> Budak tidak mewarisi.</li>
+            </ul>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "4. Ahli Waris & Bagian Pasti (Furudhul Muqaddarah)",
+      icon: <Users className="h-5 w-5 text-emerald-600" />,
+      content: (
+        <div className="space-y-4 text-sm text-slate-600">
+          <p>Bagian pasti yang disebutkan dalam Al-Qur'an ada 6: <strong>1/2, 1/4, 1/8, 2/3, 1/3, 1/6</strong>.</p>
+          
+          <div className="grid gap-2">
+            <div className="p-2 border rounded bg-white">
+              <span className="font-bold text-emerald-700 bg-emerald-100 px-2 rounded mr-2">1/2</span>
+              Diberikan kepada:
+              <ul className="list-disc pl-5 mt-1 text-xs">
+                <li>Suami (jika istri tdk punya anak).</li>
+                <li>Anak Perempuan tunggal (jika tdk ada anak laki).</li>
+                <li>Cucu Perempuan tunggal dari anak laki (jika tdk ada anak).</li>
+                <li>Saudara Perempuan Kandung tunggal (Kalalah).</li>
+              </ul>
+            </div>
+            <div className="p-2 border rounded bg-white">
+              <span className="font-bold text-emerald-700 bg-emerald-100 px-2 rounded mr-2">1/4</span>
+              Diberikan kepada:
+              <ul className="list-disc pl-5 mt-1 text-xs">
+                <li>Suami (jika istri punya anak).</li>
+                <li>Istri (jika suami tdk punya anak).</li>
+              </ul>
+            </div>
+            <div className="p-2 border rounded bg-white">
+              <span className="font-bold text-emerald-700 bg-emerald-100 px-2 rounded mr-2">1/8</span>
+              Diberikan kepada: Istri (jika suami punya anak). Dibagi rata jika istri lebih dari 1.
+            </div>
+            <div className="p-2 border rounded bg-white">
+              <span className="font-bold text-emerald-700 bg-emerald-100 px-2 rounded mr-2">2/3</span>
+              Diberikan kepada (jika berjumlah 2 orang atau lebih):
+              <ul className="list-disc pl-5 mt-1 text-xs">
+                <li>Anak Perempuan (tanpa anak laki).</li>
+                <li>Cucu Perempuan (tanpa anak/cucu laki).</li>
+                <li>Saudara Perempuan Kandung/Sebapak (Kalalah).</li>
+              </ul>
+            </div>
+            <div className="p-2 border rounded bg-white">
+              <span className="font-bold text-emerald-700 bg-emerald-100 px-2 rounded mr-2">1/3</span>
+              Diberikan kepada:
+              <ul className="list-disc pl-5 mt-1 text-xs">
+                <li>Ibu (jika tdk ada anak & tdk ada 2 saudara atau lebih).</li>
+                <li>Saudara Seibu (jika berjumlah 2 atau lebih).</li>
+              </ul>
+            </div>
+            <div className="p-2 border rounded bg-white">
+              <span className="font-bold text-emerald-700 bg-emerald-100 px-2 rounded mr-2">1/6</span>
+              Diberikan kepada:
+              <ul className="list-disc pl-5 mt-1 text-xs">
+                <li>Ayah (jika ada anak laki-laki).</li>
+                <li>Ibu (jika ada anak atau ada 2 saudara lebih).</li>
+                <li>Kakek (jika tdk ada ayah).</li>
+                <li>Nenek (jika tdk ada ibu).</li>
+                <li>Cucu Pr (pelengkap 2/3 bersama 1 anak Pr).</li>
+                <li>Saudara Seibu (sendirian).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "5. Konsep Asabah (Sisa)",
+      icon: <PieChartIcon className="h-5 w-5 text-emerald-600" />,
+      content: (
+        <div className="space-y-2 text-sm text-slate-600">
+          <p><strong>Asabah</strong> adalah ahli waris yang menerima sisa harta setelah dibagikan kepada Ashabul Furudh. Jika harta habis, mereka tidak dapat apa-apa (kecuali Anak Laki-laki yang tidak mungkin gugur).</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Asabah bin Nafs:</strong> Laki-laki yang nasabnya tersambung langsung (Anak Lk, Ayah, Kakek, Sdr Lk Kandung, Paman).</li>
+            <li><strong>Asabah bil Ghair:</strong> Perempuan yang menjadi asabah karena ditarik saudara laki-lakinya (Anak Pr ditarik Anak Lk, Sdr Pr ditarik Sdr Lk). Bagian Laki-laki = 2x Perempuan.</li>
+            <li><strong>Asabah ma'al Ghair:</strong> Perempuan yang menjadi asabah bersama perempuan lain (Sdr Pr Kandung menjadi asabah jika ada Anak Perempuan).</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "6. Hijab (Penghalang Personil)",
+      icon: <List className="h-5 w-5 text-emerald-600" />,
+      content: (
+        <div className="space-y-2 text-sm text-slate-600">
+          <p><strong>Hijab</strong> adalah terhalangnya seseorang mendapatkan warisan karena adanya ahli waris lain yang lebih dekat (lebih utama).</p>
+          <div className="bg-slate-50 p-3 rounded border border-slate-200">
+            <p className="font-bold text-slate-800 mb-2">Contoh Hirman (Terhalang Total):</p>
+            <ul className="list-disc pl-5 text-xs space-y-1">
+              <li><strong>Kakek</strong> terhalang oleh <strong>Ayah</strong>.</li>
+              <li><strong>Nenek</strong> terhalang oleh <strong>Ibu</strong>.</li>
+              <li><strong>Cucu</strong> terhalang oleh <strong>Anak Laki-laki</strong>.</li>
+              <li><strong>Saudara</strong> terhalang oleh <strong>Anak Laki-laki</strong> atau <strong>Ayah</strong>.</li>
+              <li><strong>Paman</strong> terhalang oleh <strong>Saudara Laki-laki</strong>, <strong>Anak</strong>, atau <strong>Ayah</strong>.</li>
+            </ul>
+          </div>
+          <div className="bg-slate-50 p-3 rounded border border-slate-200 mt-2">
+            <p className="font-bold text-slate-800 mb-2">Contoh Nuqsan (Pengurangan Bagian):</p>
+            <ul className="list-disc pl-5 text-xs space-y-1">
+              <li><strong>Suami</strong> turun dari 1/2 ke 1/4 jika ada anak.</li>
+              <li><strong>Istri</strong> turun dari 1/4 ke 1/8 jika ada anak.</li>
+              <li><strong>Ibu</strong> turun dari 1/3 ke 1/6 jika ada anak.</li>
+            </ul>
+          </div>
+        </div>
+      )
     }
   ];
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-3 sm:mb-4">Belajar Hukum Waris</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">Belajar Hukum Waris Islam</h2>
+        <p className="text-slate-600 text-sm mb-6">Panduan lengkap ilmu Faraid dari dasar hingga rincian pembagian.</p>
         
-        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {topics.map((topic, idx) => (
-            <div key={idx} className="bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="p-2 bg-emerald-100 rounded-lg flex-shrink-0">
-                  {topic.icon}
+        <div className="space-y-3">
+          {sections.map((section, idx) => (
+            <div key={idx} className="border border-slate-200 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md bg-white">
+              <button 
+                onClick={() => toggleSection(idx)}
+                className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-slate-50 transition-colors"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                    {section.icon}
+                  </div>
+                  <h3 className="font-bold text-slate-800 text-sm sm:text-base">{section.title}</h3>
                 </div>
-                <h3 className="font-semibold text-slate-900 text-sm sm:text-base">{topic.title}</h3>
-              </div>
-              <div className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                {topic.content}
-              </div>
+                {openSection === idx ? <ChevronUp size={20} className="text-slate-400"/> : <ChevronDown size={20} className="text-slate-400"/>}
+              </button>
+              
+              {openSection === idx && (
+                <div className="p-4 pt-0 border-t border-slate-100 bg-white animate-in slide-in-from-top-2">
+                  <div className="pt-4">
+                    {section.content}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
+        </div>
+
+        <div className="mt-8 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+          <h4 className="font-bold text-yellow-800 flex items-center text-sm">
+            <Info className="h-4 w-4 mr-2" /> Catatan Penting
+          </h4>
+          <p className="text-yellow-700 text-xs sm:text-sm mt-1">
+            Ilmu waris memiliki banyak percabangan kasus (seperti 'Aul, Radd, Gharawain, Musyarakah). Aplikasi ini menangani kasus standar dan umum. Untuk kasus sengketa atau yang sangat kompleks, sangat disarankan berkonsultasi langsung dengan Ulama atau Ahli Faraid.
+          </p>
         </div>
       </div>
     </div>
