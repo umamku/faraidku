@@ -143,7 +143,7 @@ const DistributionChart = ({ data }) => {
   );
 };
 
-// --- KOMPONEN FAMILY TREE INTERAKTIF (PERBAIKAN SCROLL) ---
+// --- KOMPONEN FAMILY TREE INTERAKTIF (PERBAIKAN SCROLL MOBILE) ---
 const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGender }) => {
   const [showExtended, setShowExtended] = useState(false);
 
@@ -177,7 +177,7 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
     const textSize = small ? "text-[9px] leading-tight" : "text-[10px] sm:text-xs leading-tight";
 
     return (
-      <div className={`flex flex-col items-center z-10 transition-all duration-300 animate-in zoom-in group relative flex-shrink-0 mx-1 ${isMain ? 'scale-110' : ''} ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className={`flex flex-col items-center z-10 animate-in zoom-in group relative flex-shrink-0 mx-1 ${isMain ? 'scale-110' : ''} ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
         <button 
           onClick={onClick}
           className={`${baseSize} rounded-full border-2 flex items-center justify-center mb-1 relative shadow-sm transition-all
@@ -211,7 +211,6 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
   };
 
   return (
-    // FIX: Hapus overflow-hidden dari container utama
     <div className="w-full bg-white rounded-lg border border-slate-200 p-2 sm:p-4 mb-4 relative">
       <div className="flex justify-between items-center mb-4 px-2 border-b border-slate-100 pb-2">
         <h4 className="text-sm font-bold text-slate-700 flex items-center">
@@ -227,10 +226,10 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
         </button>
       </div>
       
-      {/* FIX: Hapus scrollbar-hide dan tambah padding bottom agar scrollbar muat */}
-      <div className="w-full overflow-x-auto pb-4">
-        {/* FIX: Tambah min-w-[600px] pada mode extended agar memicu scroll di HP */}
-        <div className={`flex flex-col items-center transition-all duration-500 ${showExtended ? 'min-w-[600px]' : 'w-full'}`}>
+      {/* Scrollable Container dengan touch-pan-x dan lebar paksa */}
+      <div className="w-full overflow-x-auto pb-4 touch-pan-x">
+        {/* Menggunakan w-max saat extended untuk memaksa overflow horizontal jika konten lebar */}
+        <div className={`flex flex-col items-center ${showExtended ? 'w-max min-w-full px-4 mx-auto' : 'w-full'}`}>
           
           {/* LEVEL 0: KAKEK & NENEK */}
           {showExtended && (
@@ -377,7 +376,7 @@ const InteractiveFamilyTree = ({ heirs, setHeirs, jenazahGender, setJenazahGende
   );
 };
 
-// --- KOMPONEN BELAJAR (DIPERBARUI) ---
+// --- KOMPONEN BELAJAR (TETAP SAMA) ---
 const LearningModule = () => {
   const [openSection, setOpenSection] = useState(null);
 
@@ -612,7 +611,7 @@ const LearningModule = () => {
   );
 };
 
-// --- KOMPONEN KALKULATOR ---
+// --- KOMPONEN KALKULATOR (TETAP SAMA) ---
 const CalculatorModule = () => {
   // State Input
   const [totalHarta, setTotalHarta] = useState(100000000);
